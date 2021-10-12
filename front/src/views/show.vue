@@ -10,10 +10,7 @@ import axios from 'axios'
 export default {
     data(){
         return{
-            postShow: {
-                title:'titre',
-                content: 'contenue'
-            }
+            postShow: null
         }
     },
     async mounted(){
