@@ -43,8 +43,12 @@ export default new Vuex.Store({
     addPost(state,post){
       state.posts.push(post)
     },
-    editPost(){
-      
+    editPost(state,post){
+      Object.assign(state.posts, post)
+    },
+    deletePost(state,payload){
+      const i = state.posts.map(item => item.id).indexOf(payload.id);
+      state.posts.splice(i, 1);
     }
   },
   actions: {
@@ -73,6 +77,21 @@ export default new Vuex.Store({
       let response = await axios.post('/api/posts', data.post)
       commit('addPost',response.data)
       console.log(response.data)
+    },
+    async editPost({commit},data){
+      axios.defaults.headers.common.Authorization = `Bearer ${data.token}`
+      console.log(data)
+      let response = await axios.put('/api/posts/'+data.post.id, data.post)
+      console.log(response.data)
+      commit('editPost',response.data)
+      
+    },
+    async deletePost({commit},data){
+      axios.defaults.headers.common.Authorization = `Bearer ${data.token}`
+      console.log(data)
+      let response = await axios.delete('/api/posts/'+data.post.id)
+      console.log(response)
+      commit('deletePost',data.post)
     }
   },
   modules: {

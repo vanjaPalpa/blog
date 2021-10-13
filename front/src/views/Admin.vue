@@ -43,7 +43,7 @@
               <td>{{ post.title }}</td>
               <td>{{ post.content }}</td>
               <td><button @click="edit(post)">modifier</button></td>
-              <td><button @click="deletePost(post.id)">supprimer</button></td>
+              <td><button @click="deletePost(post)">supprimer</button></td>
             </tr>
           </tbody>
         </table>
@@ -52,7 +52,7 @@
     </div>
 </template>
 <script>
-import axios from 'axios'
+
 export default {
   data(){
     return{
@@ -119,14 +119,18 @@ export default {
       console.log('le post id est ' +post.content)
     },
     async editRequest(){
-      let user = JSON.parse(localStorage.getItem('user'));
-      console.log(user.token)
-      let tokenbear = user.token
-      axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
+      // let user = JSON.parse(localStorage.getItem('user'));
+      // console.log(user.token)
+      // let tokenbear = user.token
+      // axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
 
-      let response = await axios.put('/api/posts/'+this.editPost.id, this.editPost)
+      let token = this.$store.getters.getToken
+      let data = {
+        token: token,
+        post:this.editPost
+      }
 
-      console.log(response)
+      this.$store.dispatch('editPost',data)
       this.editFlag = false;
 
 
@@ -144,15 +148,21 @@ export default {
       this.$store.dispatch('AddPost',data)
     
     },
-    async deletePost(id){
-      let user = JSON.parse(localStorage.getItem('user'));
-      console.log(user.token)
-      let tokenbear = user.token
-      axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
+    async deletePost(post){
+      // let user = JSON.parse(localStorage.getItem('user'));
+      // console.log(user.token)
+      // let tokenbear = user.token
+      // axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
 
-      let response = await axios.delete('/api/posts/'+id)
+      // let response = await axios.delete('/api/posts/'+id)
 
-      console.log(response)
+      // console.log(response)
+      let token = this.$store.getters.getToken
+      let data = {
+        token: token,
+        post:post
+      }
+      this.$store.dispatch('deletePost',data)
     }
   }
 }
