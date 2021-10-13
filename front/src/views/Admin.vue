@@ -1,10 +1,10 @@
 <template>
     <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-md w-full space-y-8">
-        <h1>This is an Admin page</h1>
-        <h2 v-if="user"> connecter</h2>
+        <h1>This is an Admin page </h1>
+        <h2 v-if="this.$store.getters.getStatus"> connecter</h2>
         <h2 v-else >non connecter</h2>
-        <form v-if="user == null" class="mt-8 space-y-6" @submit.prevent="login">
+        <form v-if="this.$store.getters.getStatus == false" class="mt-8 space-y-6" @submit.prevent="login">
           <div>
             <label for="email-address" class="sr-only">Email address</label>
             <input type="text" v-model="form.email" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
@@ -18,9 +18,9 @@
           <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">se connecter</button>
         </form>
 
-        <button v-if="user" @click="logout">logout</button>
+        <button v-if="this.$store.getters.getStatus" @click="logout">logout</button>
 
-        <div v-if="user">
+        <div v-if="this.$store.getters.getStatus">
           <input v-model="CreatePost.title" type="text">
           <textarea v-model="CreatePost.content" name="" id="" cols="30" rows="3"></textarea>
           <button @click="add">Ajouter</button>
@@ -31,7 +31,7 @@
           <button @click="editRequest" >Update</button>
         </div>
 
-        <table v-if="user" class="table-auto">
+        <table v-if="this.$store.getters.getStatus" class="table-auto">
           <thead>
             <tr>
               <th>Titre</th>
@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="post in posts" v-bind:key="post.id">
+            <tr v-for="post in this.$store.getters.getAllPosts" v-bind:key="post.id">
               <td>{{ post.title }}</td>
               <td>{{ post.content }}</td>
               <td><button @click="edit(post)">modifier</button></td>
@@ -67,9 +67,15 @@ export default {
   },
   async mounted(){
     this.user = JSON.parse(localStorage.getItem('user'));
-    let response = await axios.get('/api/posts');
+    // let response = await axios.get('/api/posts');
 
-    this.posts = response.data
+    // this.posts = response.data
+
+    this.$store.dispatch('GetPosts')
+    if(this.user){
+      this.$store.commit('setUser',this.user)
+    }
+
   },
   methods:{
     async login(){
@@ -94,16 +100,18 @@ export default {
       }
     },
     async logout(){
-      let user = JSON.parse(localStorage.getItem('user'));
-      console.log(user.token)
-      let tokenbear = user.token
-      axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
-      await axios.get('/sanctum/csrf-cookie')
-      let r = await axios.post('/api/logout')
-      localStorage.removeItem('user')
-      this.user = null
+      // let user = JSON.parse(localStorage.getItem('user'));
+      // console.log(user.token)
+      // let tokenbear = user.token
+      // axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
+      // await axios.get('/sanctum/csrf-cookie')
+      // let r = await axios.post('/api/logout')
+      // localStorage.removeItem('user')
+      // this.user = null
 
-      console.log(r.data.message)
+      // console.log(r.data.message)
+      let token = this.$store.getters.getToken
+      this.$store.dispatch('logout',token)
     },
     edit(post){
       this.editFlag = true;
@@ -124,12 +132,17 @@ export default {
 
     },
     async add(){
-      let user = JSON.parse(localStorage.getItem('user'));
-      console.log(user.token)
-      let tokenbear = user.token
-      axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
-      let response = await axios.post('/api/posts', this.CreatePost)
-      console.log(response.data)
+      // let user = JSON.parse(localStorage.getItem('user'));
+      // console.log(user.token)
+      // let tokenbear = user.token
+      // axios.defaults.headers.common.Authorization = `Bearer ${tokenbear}`
+      let token = this.$store.getters.getToken
+      let data = {
+        token: token,
+        post:this.CreatePost
+      }
+      this.$store.dispatch('AddPost',data)
+    
     },
     async deletePost(id){
       let user = JSON.parse(localStorage.getItem('user'));
