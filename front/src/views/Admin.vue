@@ -20,7 +20,7 @@
 
         <button v-if="user" @click="logout">logout</button>
 
-        <div>
+        <div v-if="user">
           <input v-model="CreatePost.title" type="text">
           <textarea v-model="CreatePost.content" name="" id="" cols="30" rows="3"></textarea>
           <button @click="add">Ajouter</button>
@@ -74,17 +74,19 @@ export default {
   methods:{
     async login(){
       try {
-        await axios.get('/sanctum/csrf-cookie')
-        let rs = await axios.post('/api/login', this.form)
+        // await axios.get('/sanctum/csrf-cookie')
+        // let rs = await axios.post('/api/login', this.form)
 
-        let token = rs.data.token
-        console.log(token);
-        this.user = rs.data
-        localStorage.setItem('user', JSON.stringify(rs.data));
+        // let token = rs.data.token
+        // console.log(token);
+        // this.user = rs.data
+        // localStorage.setItem('user', JSON.stringify(rs.data));
 
-        let response = await axios.get('/api/user',{headers: {'Authorization': `Bearer ${token}`}})
+        // let response = await axios.get('/api/user',{headers: {'Authorization': `Bearer ${token}`}})
 
-        console.log(response)
+        // console.log(response)
+
+        this.$store.dispatch('login',this.form)
 
         
       } catch (error) {
